@@ -32,13 +32,16 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    // validate body for name
-    const [id] = await db("cohorts").insert(req.body);
+    if (!req.body.name) {
+      res.status(400).json({ error: "Must provide name to update cohort" });
+    } else {
+      const [id] = await db("cohorts").insert(req.body);
 
-    const created = await db("cohorts")
-      .where({ id })
-      .first();
-    res.status(201).json(created);
+      const created = await db("cohorts")
+        .where({ id })
+        .first();
+      res.status(201).json(created);
+    }
   } catch (error) {
     res.status(500).json({ error: "Error creating cohort" });
   }
@@ -62,7 +65,7 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     if (!req.body.name) {
-      res.status(400).json({ error: "Must provide a name to update cohort" });
+      res.status(400).json({ error: "Must provide name to update cohort" });
     } else {
       const count = await db("cohorts")
         .where({ id: req.params.id })
